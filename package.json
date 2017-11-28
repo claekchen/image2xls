@@ -1,0 +1,26 @@
+{
+  "name": "image2xls",
+  "version": "1.0.0",
+  "description": "Using Baidu OCR API  to Convert image to excel file",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/claekchen/image2xls.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/claekchen/image2xls/issues"
+  },
+  "homepage": "https://github.com/claekchen/image2xls#readme",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "fs": "0.0.1-security",
+    "path": "^0.12.7",
+    "request": "^2.83.0",
+    "superagent": "^3.8.1"
+  }
+}
