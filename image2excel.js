@@ -3,7 +3,7 @@ const Promise = require('bluebird')
 const superagent = Promise.promisifyAll(require('superagent'))
 const path = require('path')
 const request = Promise.promisifyAll(require('request'))
-const token = '24.a1b52ed7c6fdd1a8bd7f4f51340a8e15.2592000.1514443352.282335-10449729'
+const token = ''
 let filePath = path.resolve('./image')
 let filenames = []
 let requestIds = []
@@ -87,23 +87,30 @@ function getBaidu (id) {
 }
 function fileDisplay (filePath) {
     // 根据文件路径读取文件，返回文件列表
-  fs.readdir(filePath, function (err, files) {
-    if (err) {
-      console.warn(err)
-    } else {
-            // 遍历读取到的文件列表
-      Promise.map(files, function (filename) {
-        return getDir(filename)
-      }, {concurrency: 5}).then(function () {
-        return Promise.map(filenames, function (nums) {
-          return requestBaidu(nums)
-        }, {concurrency: 1}).then(function () {
+  return new Promise(function (resolve, reject) {
+    fs.readdir(filePath, function (err, files) {
+      if (err) {
+        console.warn(err)
+      } else {
+              // 遍历读取到的文件列表
+        Promise.map(files, function (filename) {
+          return getDir(filename)
+        }, {concurrency: 5})
+        .then(function () {
+          return Promise.map(filenames, function (nums) {
+            return requestBaidu(nums)
+          }, {concurrency: 1})
+        })
+        .then(function () {
           return Promise.map(requestIds, function (id) {
             return getBaidu(id)
           }, {concurrency: 1})
         })
-      })
-    }
+        .then(function () {
+          resolve()
+        })
+      }
+    })
   })
 }
-fileDisplay(filePath)
+module.exports = fileDisplay

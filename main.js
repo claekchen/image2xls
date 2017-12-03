@@ -1,21 +1,27 @@
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow, ipcMain} = require('electron')
 const path = require('path')
 const url = require('url')
+const pkg = require('./package.json')
+const Promise = require('bluebird')
+const image2excel = Promise.promisifyAll(require('./image2excel.js'))
 
 // 保持一个对于 window 对象的全局引用，如果你不这样做，
 // 当 JavaScript 对象被垃圾回收， window 会被自动地关闭
 let win
 
 function createWindow () {
-  // 创建浏览器窗口。
+  // 创建浏览器窗口
   win = new BrowserWindow({width: 800, height: 600})
-
-  // 然后加载应用的 index.html。
-  win.loadURL(url.format({
-    pathname: path.join(__dirname, 'index.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
+  if (pkg.DEV) {
+    win.loadURL('http://localhost:3000/')
+  } else {
+      // 然后加载应用的 index.html。
+    win.loadURL(url.format({
+      pathname: path.join(__dirname, 'index.html'),
+      protocol: 'file:',
+      slashes: true
+    }))
+  }
 
   // 打开开发者工具。
   win.webContents.openDevTools()
@@ -49,6 +55,11 @@ app.on('activate', () => {
   if (win === null) {
     createWindow()
   }
+})
+ipcMain.on('filePath', (evt, arg) => {
+  image2excel(arg[0]).then(() => {
+    evt.sender.send('fileSuccess', arg)
+  })
 })
 
 // 在这文件，你可以续写应用剩下主进程代码。
