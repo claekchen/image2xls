@@ -2,7 +2,6 @@ const fs = require('fs')
 const Promise = require('bluebird')
 const superagent = Promise.promisifyAll(require('superagent'))
 const path = require('path')
-const request = Promise.promisifyAll(require('request'))
 const token = '24.a1b52ed7c6fdd1a8bd7f4f51340a8e15.2592000.1514443352.282335-10449729'
 let filePath = path.resolve('./image')
 let filenames = []
@@ -43,7 +42,7 @@ function requestBaidu (file) {
       imageBuf = imageBuf.toString('base64')
       console.log(file)
       // console.log(imageBuf)
-      superagent.post('https://aip.baidubce.com/rest/2.0/solution/v1/form_ocr/request?access_token=' + token)
+      superagent.post('https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic?access_token=' + token)
       .send({image: imageBuf})
       .set('Content-Type', 'application/x-www-form-urlencoded')
       .end(function (err, res) {
@@ -55,34 +54,16 @@ function requestBaidu (file) {
         if (res.error_coode) {
           console.log('error')
         } else {
-          console.log(res.result[0].request_id)
-          requestIds.push(res.result[0].request_id)
+          // console.log(JSON.stringify(res))
+          let resString = ''
+          for (let i = 0; res.words_result[i]; i++) {
+            resString += res.words_result[i].words
+          }
+          console.log(resString)
           resolve()
         }
       })
     }
-  })
-}
-function getBaidu (id) {
-  var waitUntil = new Date(new Date().getTime() + 3 * 10000)
-  while (waitUntil > new Date()) {
-
-  }
-  return new Promise(function (resolve, reject) {
-    superagent.post('https://aip.baidubce.com/rest/2.0/solution/v1/form_ocr/get_request_result?access_token=' + token)
-    .send({request_id: id})
-    .set('Content-Type', 'application/x-www-form-urlencoded')
-    .then(function (res) {
-      console.log(res.text)
-      let url = JSON.parse(res.text).result.result_data
-      resUrl.push(url)
-      let filename = './excel/' + id + '.xls'
-      let stream = fs.createWriteStream(filename)
-      request(url).pipe(stream).on('close', function () {
-        console.log(filename + '下载完毕')
-        resolve()
-      })
-    })
   })
 }
 function fileDisplay (filePath) {
@@ -102,11 +83,6 @@ function fileDisplay (filePath) {
           }, {concurrency: 1})
         })
         .then(function () {
-          return Promise.map(requestIds, function (id) {
-            return getBaidu(id)
-          }, {concurrency: 1})
-        })
-        .then(function () {
           resolve()
         })
       }
@@ -114,3 +90,4 @@ function fileDisplay (filePath) {
   })
 }
 module.exports = fileDisplay
+fileDisplay('./image/')

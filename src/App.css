@@ -1,0 +1,41 @@
+
+.App {
+  position: relative;
+}
+.App-header {
+  background-color: #222;
+  height: 50px;
+  padding: 10px;
+  color: white;
+  text-align: center;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+#list{
+  position: relative;
+  margin-left: 10px;
+  width: 60%;
+}
+#list .list_search input{
+  width: 70%;
+}
+#list .list_info ul{
+  list-style: none; 
+  padding: 0px;
+}
+#info{
+  position: fixed;
+  right:30px;
+  width: 30%;
+  top:120px;
+}
+#info img{
+  width: 150px;
+  height:150px;
+}
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
